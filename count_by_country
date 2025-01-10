@@ -22,7 +22,7 @@ five_to_fourteen as ((select count(string_field_0) as count, coalesce(string_fie
     having country NOT LIKE '1%' 
  order by count desc)
 
- select coalesce(fifteen_to_thirty.country, 'Unknown'), sum(highest.count) as highest, sum(fifteen_to_thirty.count) as fifteen_to_thirty_count, sum(five_to_fourteen.count) as five_to_fourteen_count, sum(lowest.count) as less_than_5
+ select coalesce(fifteen_to_thirty.country, 'Unknown') as country, sum(highest.count) as highest, sum(fifteen_to_thirty.count) as fifteen_to_thirty_count, sum(five_to_fourteen.count) as five_to_fourteen_count, sum(lowest.count) as less_than_5
  from fifteen_to_thirty
  full join five_to_fourteen
  ON fifteen_to_thirty.country=five_to_fourteen.country
