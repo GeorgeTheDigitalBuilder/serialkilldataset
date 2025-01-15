@@ -1,0 +1,38 @@
+SELECT 
+    COALESCE(t1.string_field_1, t2.string_field_1) AS country,
+    COALESCE(
+        CAST(ROUND(AVG(SAFE_CAST(REGEXP_REPLACE(t1.string_field_3, r'[^0-9]', '') AS FLOAT64)), 2) AS STRING), 
+        'N/A'
+    ) AS Average_Proven_Victims_15_to_30,
+    COALESCE(
+        CAST(ROUND(AVG(SAFE_CAST(REGEXP_REPLACE(t2.string_field_3, r'[^0-9]', '') AS FLOAT64)), 2) AS STRING), 
+        'N/A'
+    ) AS Average_Proven_Victims_5_to_14,
+    COALESCE(
+        CAST(ROUND(AVG(SAFE_CAST(REGEXP_REPLACE(t3.string_field_3, r'[^0-9]', '') AS FLOAT64)), 2) AS STRING), 
+        'N/A'
+    ) AS Average_Proven_Victims_highest,
+    COALESCE(
+        CAST(ROUND(AVG(SAFE_CAST(REGEXP_REPLACE(t4.string_field_3, r'[^0-9]', '') AS FLOAT64)), 2) AS STRING), 
+        'N/A'
+    ) AS Average_Proven_Victims_less_than_5
+FROM `projectt-446713.serial_k.15_to_30` t1
+FULL JOIN `projectt-446713.serial_k.5_to_14` t2
+ON TRIM(LOWER(t1.string_field_1)) = TRIM(LOWER(t2.string_field_1))
+full join `projectt-446713.serial_k.highest` t3
+on TRIM(LOWER(t1.string_field_1)) = TRIM(LOWER(t3.string_field_1))
+full join `projectt-446713.serial_k.less_than_5` t4
+ON TRIM(LOWER(t1.string_field_1)) = TRIM(LOWER(t4.string_field_1))
+WHERE 
+    (t1.string_field_1 NOT LIKE '%1%') AND
+    (t1.string_field_1 NOT LIKE '%Country%') AND
+    (t1.string_field_3 NOT LIKE '%–%'OR t1.string_field_3 IS NULL) AND
+    (t2.string_field_3 NOT LIKE '%–%' OR t2.string_field_3 IS NULL) AND
+    (t1.string_field_3 NOT LIKE '%+%' OR t1.string_field_3 IS NULL) AND
+    (t2.string_field_3 NOT LIKE '%+%' OR t2.string_field_3 IS NULL) AND
+    (t3.string_field_3 NOT LIKE '%–%' OR t3.string_field_3 IS NULL) AND
+    (t3.string_field_3 NOT LIKE '%+%' OR t3.string_field_3 IS NULL) AND
+    (t4.string_field_3 NOT LIKE '%–%' OR t4.string_field_3 IS NULL) AND
+    (t4.string_field_3 NOT LIKE '%+%' OR t4.string_field_3 IS NULL)
+GROUP BY COALESCE(t1.string_field_1, t2.string_field_1)
+ORDER BY Average_Proven_Victims_15_to_30 DESC;
