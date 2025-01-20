@@ -1,0 +1,33 @@
+with fifteen as (select count(string_field_0) as count_15_to_30, coalesce(string_field_1, 'Unknown') as country
+ from projectt-446713.serial_k.15_to_30
+  group by country
+    having country NOT LIKE '1%' 
+ order by count_15_to_30 desc),
+
+five as ((select count(string_field_0) as count_5_to_14, coalesce(string_field_1, 'Unknown') as country
+ from projectt-446713.serial_k.5_to_14
+  group by country
+    having country NOT LIKE '1%' 
+ order by count_5_to_14 desc)),
+
+ less_than_5 as ((select count(string_field_0) as count_less_than_5, coalesce(string_field_1, 'Unknown') as country
+ from projectt-446713.serial_k.less_than_5
+  group by country
+    having country NOT LIKE '1%' 
+ order by count_less_than_5 desc)),
+
+  highest as ((select count(string_field_0) as count_highest, coalesce(string_field_1, 'Unknown') as country
+ from projectt-446713.serial_k.highest
+  group by country
+    having country NOT LIKE '1%' 
+ order by count_highest desc))
+
+ select coalesce(fifteen.country, 'Unknown') as country, fifteen.count_15_to_30, five.count_5_to_14, less_than_5.count_less_than_5, highest.count_highest
+ from fifteen
+ full join five
+ ON fifteen.country=five.country
+ full join less_than_5
+ ON fifteen.country = less_than_5.country
+ full join highest
+ on fifteen.country = highest.country
+ order by fifteen.count_15_to_30 desc
