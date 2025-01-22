@@ -1,0 +1,48 @@
+with clean_dates as (
+select string_field_0, string_field_1, ltrim(string_field_2) as clean_left, rtrim(string_field_3) clean_right
+from projectt-446713.serial_k.15_to_30),
+
+seperate_dates_15_to_30 as ( 
+  select string_field_0, string_field_1, left(clean_left, 4) as date_started, right(clean_right, 4) as date_ended
+  from clean_dates),
+
+clean_dates_5_to_14 as (
+select string_field_0, string_field_1, ltrim(string_field_2) as clean_left, rtrim(string_field_3) clean_right
+from projectt-446713.serial_k.5_to_14),
+
+seperate_date_5_to_14 as ( 
+  select string_field_0, string_field_1, left(clean_left, 4) as date_started, right(clean_right, 4) as date_ended
+  from clean_dates_5_to_14),
+
+clean_dates_less_than_5 as (
+select string_field_0, string_field_1, ltrim(string_field_2) as clean_left, rtrim(string_field_3) clean_right
+from projectt-446713.serial_k.less_than_5),
+
+seperate_date_less_than_5 as ( 
+  select string_field_0, string_field_1, left(clean_left, 4) as date_started, right(clean_right, 4) as date_ended
+  from clean_dates_less_than_5),
+
+clean_dates_highest as (
+select string_field_0, string_field_1, ltrim(string_field_2) as clean_left, rtrim(string_field_3) clean_right
+from projectt-446713.serial_k.highest),
+
+seperate_dates_highest as ( 
+  select string_field_0, string_field_1, left(clean_left, 4) as date_started, right(clean_right, 4) as date_ended
+  from clean_dates_highest)
+ 
+select count(string_field_1) as serial_killer_count,cast(round(safe_cast(date_started AS FLOAT64), -1) as int64) as decade from (select string_field_0, string_field_1, coalesce(date_started, 'Unknown') as date_started, coalesce(date_started, 'Unknown') as date_ended from seperate_dates_15_to_30
+
+UNION ALL 
+
+select string_field_0, string_field_1, coalesce(date_started, 'Unknown') as date_started, coalesce(date_started, 'Unknown') as date_ended from seperate_date_less_than_5
+
+UNION ALL
+
+select string_field_0, string_field_1, coalesce(date_started, 'Unknown') as date_started, coalesce(date_started, 'Unknown') as date_ended from seperate_date_5_to_14
+
+UNION ALL
+
+select string_field_0, string_field_1, coalesce(date_started, 'Unknown') as date_started, coalesce(date_started, 'Unknown') as date_ended from seperate_dates_highest) as subquery
+where safe_cast(date_started as float64) IS NOT NULL and cast(round(safe_cast(date_started AS FLOAT64), -1) as int64)>999
+GROUP BY decade
+ORDER BY decade;
