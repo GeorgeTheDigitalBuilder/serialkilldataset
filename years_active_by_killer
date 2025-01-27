@@ -1,0 +1,109 @@
+WITH seperate_dates_15_to_30 AS (
+    SELECT 
+        string_field_0 AS killer, 
+        string_field_1 AS country, 
+        CASE
+            WHEN REGEXP_CONTAINS(string_field_2, r'\b\d{4}\b to \b\d{4}\b') THEN 
+                CAST(REGEXP_EXTRACT(string_field_2, r'\b\d{4}\b') AS INT64)
+            WHEN REGEXP_CONTAINS(string_field_2, r'\b\d{4}\b') THEN 
+                CAST(REGEXP_EXTRACT(string_field_2, r'\b\d{4}\b') AS INT64)
+            ELSE NULL
+        END AS year_started,
+        CASE
+            WHEN REGEXP_CONTAINS(string_field_2, r'\b\d{4}\b to \b\d{4}\b') THEN 
+                CAST(REGEXP_EXTRACT(string_field_2, r'(\b\d{4}\b)$') AS INT64)
+            WHEN REGEXP_CONTAINS(string_field_2, r'\b\d{4}\b') THEN 
+                CAST(REGEXP_EXTRACT(string_field_2, r'\b\d{4}\b') AS INT64)
+            ELSE NULL
+        END AS year_ended
+    FROM `projectt-446713.serial_k.15_to_30`
+),
+
+seperate_dates_5_to_14 as (SELECT 
+        string_field_0 AS killer, 
+        string_field_1 AS country, 
+        CASE
+            WHEN REGEXP_CONTAINS(string_field_2, r'\b\d{4}\b to \b\d{4}\b') THEN 
+                CAST(REGEXP_EXTRACT(string_field_2, r'\b\d{4}\b') AS INT64)
+            WHEN REGEXP_CONTAINS(string_field_2, r'\b\d{4}\b') THEN 
+                CAST(REGEXP_EXTRACT(string_field_2, r'\b\d{4}\b') AS INT64)
+            ELSE NULL
+        END AS year_started,
+        CASE
+            WHEN REGEXP_CONTAINS(string_field_2, r'\b\d{4}\b to \b\d{4}\b') THEN 
+                CAST(REGEXP_EXTRACT(string_field_2, r'(\b\d{4}\b)$') AS INT64)
+            WHEN REGEXP_CONTAINS(string_field_2, r'\b\d{4}\b') THEN 
+                CAST(REGEXP_EXTRACT(string_field_2, r'\b\d{4}\b') AS INT64)
+            ELSE NULL
+        END AS year_ended
+    FROM `projectt-446713.serial_k.5_to_14`
+),
+
+seperate_dates_less_than_5 as (SELECT 
+        string_field_0 AS killer, 
+        string_field_1 AS country, 
+        CASE
+            WHEN REGEXP_CONTAINS(string_field_2, r'\b\d{4}\b to \b\d{4}\b') THEN 
+                CAST(REGEXP_EXTRACT(string_field_2, r'\b\d{4}\b') AS INT64)
+            WHEN REGEXP_CONTAINS(string_field_2, r'\b\d{4}\b') THEN 
+                CAST(REGEXP_EXTRACT(string_field_2, r'\b\d{4}\b') AS INT64)
+            ELSE NULL
+        END AS year_started,
+        CASE
+            WHEN REGEXP_CONTAINS(string_field_2, r'\b\d{4}\b to \b\d{4}\b') THEN 
+                CAST(REGEXP_EXTRACT(string_field_2, r'(\b\d{4}\b)$') AS INT64)
+            WHEN REGEXP_CONTAINS(string_field_2, r'\b\d{4}\b') THEN 
+                CAST(REGEXP_EXTRACT(string_field_2, r'\b\d{4}\b') AS INT64)
+            ELSE NULL
+        END AS year_ended
+    FROM `projectt-446713.serial_k.less_than_5`
+),
+ seperate_dates_highest as (SELECT 
+        string_field_0 AS killer, 
+        string_field_1 AS country, 
+        CASE
+            WHEN REGEXP_CONTAINS(string_field_2, r'\b\d{4}\b to \b\d{4}\b') THEN 
+                CAST(REGEXP_EXTRACT(string_field_2, r'\b\d{4}\b') AS INT64)
+            WHEN REGEXP_CONTAINS(string_field_2, r'\b\d{4}\b') THEN 
+                CAST(REGEXP_EXTRACT(string_field_2, r'\b\d{4}\b') AS INT64)
+            ELSE NULL
+        END AS year_started,
+        CASE
+            WHEN REGEXP_CONTAINS(string_field_2, r'\b\d{4}\b to \b\d{4}\b') THEN 
+                CAST(REGEXP_EXTRACT(string_field_2, r'(\b\d{4}\b)$') AS INT64)
+            WHEN REGEXP_CONTAINS(string_field_2, r'\b\d{4}\b') THEN 
+                CAST(REGEXP_EXTRACT(string_field_2, r'\b\d{4}\b') AS INT64)
+            ELSE NULL
+        END AS year_ended
+    FROM `projectt-446713.serial_k.highest`)
+
+SELECT killer, ((year_ended+1)-year_started) as active_years from (select *
+FROM seperate_dates_15_to_30
+WHERE 
+    year_started IS NOT NULL 
+    AND year_ended IS NOT NULL
+
+    UNION ALL 
+
+    SELECT *
+FROM seperate_dates_5_to_14
+WHERE 
+    year_started IS NOT NULL 
+    AND year_ended IS NOT NULL
+
+    UNION ALL 
+
+    SELECT *
+FROM seperate_dates_highest
+WHERE 
+    year_started IS NOT NULL 
+    AND year_ended IS NOT NULL
+
+UNION ALL
+
+SELECT *
+FROM seperate_dates_less_than_5
+WHERE 
+    year_started IS NOT NULL 
+    AND year_ended IS NOT NULL)
+    group by killer, active_years order by active_years desc
